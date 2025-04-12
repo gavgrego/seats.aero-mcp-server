@@ -1,8 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
-import { getFlightsTool } from './tools/flights/getFlights.ts';
-import { GetFlightsSchema } from './tools/flights/schema.ts';
+import { getFlightsTool } from './tools/flights/getFlights.js';
+import {
+  GetBulkAvailSchema,
+  GetFlightsSchema,
+} from './tools/flights/schema.js';
+import { getBulkAvailTool } from './tools/flights/getBulkAvail.js';
 
 const server = new McpServer({
   name: 'seats-mcp',
@@ -11,10 +15,19 @@ const server = new McpServer({
 
 server.tool(
   'get_flights',
-  'Find award flights on seats.aero',
+  'Get cached award flights on seats.aero',
+  GetFlightsSchema.shape,
   async (params) => {
-    const validatedParams = GetFlightsSchema.parse(params);
-    return await getFlightsTool(validatedParams);
+    return await getFlightsTool(params);
+  }
+);
+
+server.tool(
+  'get_bulk_avail',
+  'Find bulk availability for a particular source.',
+  GetBulkAvailSchema.shape,
+  async (params) => {
+    return await getBulkAvailTool(params);
   }
 );
 
