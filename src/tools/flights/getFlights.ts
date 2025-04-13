@@ -53,11 +53,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
     content: [
       {
         type: 'text' as const,
-        text: `Found ${flightsData.data.length} flights:\n\n${JSON.stringify(
-          flightsData,
-          null,
-          2
-        )}`,
+        text: `Flights:\n\n${JSON.stringify(flightsData, null, 2)}`,
       },
     ],
   };

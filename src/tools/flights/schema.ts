@@ -67,7 +67,10 @@ export const GetBulkAvailSchema = z.object({
   cursor: z.number().optional(),
 });
 
-// Export the types for use in other files
+export const GetRoutesSchema = z.object({
+  source: z.enum(SOURCES),
+});
+
 export type CabinClass = (typeof CABIN_CLASSES)[number];
 export type OrderByOption = (typeof ORDER_BY_OPTIONS)[number];
 export type Source = (typeof SOURCES)[number];

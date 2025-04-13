@@ -29,8 +29,8 @@ const getBulkAvailTool = async (params: GetBulkAvailParams) => {
   if (destinationRegion)
     queryParams.append('destination_region', destinationRegion);
   if (cursor) queryParams.append('cursor', cursor.toString());
-  if (take) queryParams.append('take', take.toString());
-  if (skip) queryParams.append('skip', skip.toString());
+  queryParams.append('take', take.toString());
+  queryParams.append('skip', skip.toString());
 
   const bulkAvail = await fetch(
     `https://seats.aero/partnerapi/availability?${queryParams.toString()}`,
@@ -48,9 +48,11 @@ const getBulkAvailTool = async (params: GetBulkAvailParams) => {
     content: [
       {
         type: 'text' as const,
-        text: `Found ${
-          bulkAvailData.length
-        } flights on ${source}:\n\n${JSON.stringify(bulkAvailData, null, 2)}`,
+        text: `Flights on ${source}:\n\n${JSON.stringify(
+          bulkAvailData,
+          null,
+          2
+        )}`,
       },
     ],
   };
