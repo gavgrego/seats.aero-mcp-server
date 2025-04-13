@@ -1,6 +1,10 @@
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+
 # seats.aero MCP server
 
 ## Not affiliated with seats.aero
+
+A TypeScript-based, minimal MCP server for interacting with the seats.aero API via Claude desktop or any other MCP clients.
 
 ❗ You will need a seats.aero API key via a seats.aero Pro membership in order to use this tool
 
