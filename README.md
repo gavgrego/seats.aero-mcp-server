@@ -4,7 +4,7 @@
 
 ## Not affiliated with seats.aero
 
-A TypeScript-based, minimal MCP server for interacting with the seats.aero API via Claude desktop or any other MCP clients.
+A TypeScript-based, minimal MCP server for interacting with the seats.aero API via Claude desktop or any other MCP clients in natural language.
 
 ❗ You will need a seats.aero API key via a seats.aero Pro membership in order to use this tool
 
