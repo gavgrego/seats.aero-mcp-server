@@ -1,5 +1,5 @@
 import type { z } from 'zod';
-import { GetFlightsSchema } from './schema.js';
+import { GetFlightsSchema } from '../../schema.js';
 
 type GetFlightsParams = z.infer<typeof GetFlightsSchema>;
 
@@ -8,7 +8,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
     const {
       originAirport,
       destinationAirport,
-      take = 100,
+      take = 50,
       include_trips = false,
       only_direct_flights = false,
       carriers,

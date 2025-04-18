@@ -1,4 +1,4 @@
-import { GetBulkAvailSchema } from './schema.js';
+import { GetBulkAvailSchema } from '../../schema.js';
 import { z } from 'zod';
 
 type GetBulkAvailParams = z.infer<typeof GetBulkAvailSchema>;

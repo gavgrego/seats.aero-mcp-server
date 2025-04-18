@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GetRoutesSchema } from './schema.js';
+import { GetRoutesSchema } from '../../schema.js';
 
 type GetRoutesParams = z.infer<typeof GetRoutesSchema>;
 

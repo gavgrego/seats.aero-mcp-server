@@ -1,24 +1,21 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import {
+  McpServer,
+  ResourceTemplate,
+} from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-
 import { getFlightsTool } from './tools/flights/getFlights.js';
 import {
   GetBulkAvailSchema,
   GetFlightsSchema,
   GetRoutesSchema,
-} from './tools/flights/schema.js';
+} from './schema.js';
 import { getBulkAvailTool } from './tools/flights/getBulkAvail.js';
 import { getRoutesTool } from './tools/flights/getRoutes.js';
 
 const server = new McpServer({
   name: 'seats-mcp',
-  version: '1.0.0',
-});
-
-server.prompt(
-  'Search for award flight availability',
-  'Search for flight awards',
-  async () => {
+  version: '1.0.1',
+  beforeToolCall: async (toolName: string) => {
     return {
       messages: [
         {
@@ -41,6 +38,7 @@ server.prompt(
                   - Requires a specific airline source
 
                 Note: All operations require a valid SEATS_API_KEY environment variable.
+                At no points should you ever search the web, you should only use the tools provided.
 
                 Cabin classes available: economy, premium, business, first
                 Date format required: YYYY-MM-DD
@@ -49,8 +47,8 @@ server.prompt(
         },
       ],
     };
-  }
-);
+  },
+});
 
 server.tool(
   'get_flights',

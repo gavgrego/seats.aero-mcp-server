@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const CABIN_CLASSES = ['economy', 'premium', 'business', 'first'] as const;
-const ORDER_BY_OPTIONS = ['price', 'duration'] as const;
+const ORDER_BY_OPTIONS = ['', 'lowest_mileage'] as const;
 const SOURCES = [
   'eurobonus',
   'virginatlantic',
@@ -41,7 +41,7 @@ export const GetFlightsSchema = z.object({
     .regex(/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/)
     .optional(),
   cursor: z.number().optional(),
-  take: z.number().optional(),
+  take: z.number().min(10).max(1000).optional(),
   order_by: z.enum(ORDER_BY_OPTIONS).optional(),
   skip: z.number().optional(),
   include_trips: z.boolean().optional(),
@@ -62,7 +62,7 @@ export const GetBulkAvailSchema = z.object({
     .optional(),
   originRegion: z.string().optional(),
   destinationRegion: z.string().optional(),
-  take: z.number().optional(),
+  take: z.number().min(10).max(1000).optional(),
   skip: z.number().optional(),
   cursor: z.number().optional(),
 });
