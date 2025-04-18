@@ -48,6 +48,19 @@ const server = new McpServer({
       ],
     };
   },
+  onError: async (error: Error) => {
+    return {
+      messages: [
+        {
+          role: 'assistant',
+          content: {
+            type: 'text',
+            text: `An error occurred: ${error.message}\n\nPlease ensure:\n- SEATS_API_KEY is properly set\n- Input parameters are correctly formatted\n- The requested airline source is supported`,
+          },
+        },
+      ],
+    };
+  },
 });
 
 server.tool(
