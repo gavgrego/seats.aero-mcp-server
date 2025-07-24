@@ -10,6 +10,14 @@ A TypeScript-based, minimal MCP server for interacting with the seats.aero API v
 
 ❗ You will need a seats.aero API key via a seats.aero Pro membership in order to use this tool
 
+### Installing via Smithery
+
+To install seats.aero MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@gavgrego/seats-aero-mcp-server):
+
+```bash
+npx -y @smithery/cli install @gavgrego/seats-aero-mcp-server --client claude
+```
+
 ### Setup
 
 Install dependencies
