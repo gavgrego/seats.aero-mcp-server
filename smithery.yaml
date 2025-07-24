@@ -1,0 +1,19 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'node', args: ['build/index.js'], env: { SEATS_API_KEY: config.seatsApiKey } })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - seatsApiKey
+    properties:
+      seatsApiKey:
+        type: string
+        description: Your seats.aero API key
+  exampleConfig:
+    seatsApiKey: YOUR_SEATS_API_KEY
