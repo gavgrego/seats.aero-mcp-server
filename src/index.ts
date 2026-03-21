@@ -8,9 +8,11 @@ import {
   GetBulkAvailSchema,
   GetFlightsSchema,
   GetRoutesSchema,
+  GetTripsSchema,
 } from './schema.js';
 import { getBulkAvailTool } from './tools/flights/getBulkAvail.js';
 import { getRoutesTool } from './tools/flights/getRoutes.js';
+import { getTripsTool } from './tools/flights/getTrips.js';
 
 const server = new McpServer(
   {
@@ -33,6 +35,11 @@ Available tools:
 
 3. get_routes: Search for routes for a particular source
    - Requires a specific airline source
+
+4. get_trips: Get detailed itinerary for a specific availability
+   - Requires an availability ID (from get_flights or get_bulk_avail results)
+   - Returns full segment details: departure/arrival times, flight numbers, aircraft, fare class
+   - Also returns booking links for each loyalty program
 
 Note: All operations require a valid SEATS_API_KEY environment variable.
 You should only use the tools provided by this server for flight searches.
@@ -67,6 +74,15 @@ server.tool(
   GetRoutesSchema.shape,
   async (params) => {
     return await getRoutesTool(params);
+  }
+);
+
+server.tool(
+  'get_trips',
+  'Get detailed itinerary (departure/arrival times, flight numbers, segments, booking links) for a specific availability ID from seats.aero.',
+  GetTripsSchema.shape,
+  async (params) => {
+    return await getTripsTool(params);
   }
 );
 
