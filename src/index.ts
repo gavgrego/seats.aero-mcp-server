@@ -15,52 +15,6 @@ import { getRoutesTool } from './tools/flights/getRoutes.js';
 const server = new McpServer({
   name: 'seats-mcp',
   version: '1.0.1',
-  beforeToolCall: async (toolName: string) => {
-    return {
-      messages: [
-        {
-          role: 'assistant',
-          content: {
-            type: 'text',
-            text: `This server provides tools to search for award flight availability through seats.aero.
-                Available tools:
-                1. Get Flights: Search for specific flight routes between airports
-                  - Requires origin and destination airports
-                  - Optional filters for dates, cabin class, and carriers
-                  - Returns detailed flight information including pricing
-
-                2. Get Bulk Availability: Search for bulk availability across regions
-                  - Requires a specific airline source
-                  - Optional filters for cabin class, dates, and regions
-                  - Returns available award seats for the specified airline
-
-                3. Get Routes: Search for routes for a particular source
-                  - Requires a specific airline source
-
-                Note: All operations require a valid SEATS_API_KEY environment variable.
-                At no points should you ever search the web, you should only use the tools provided.
-
-                Cabin classes available: economy, premium, business, first
-                Date format required: YYYY-MM-DD
-                sources supported: eurobonus, virginatlantic, aeromexico, american, delta, etihad, united, emirates, aeroplan, alaska, velocity, qantas, and more.`,
-          },
-        },
-      ],
-    };
-  },
-  onError: async (error: Error) => {
-    return {
-      messages: [
-        {
-          role: 'assistant',
-          content: {
-            type: 'text',
-            text: `An error occurred: ${error.message}\n\nPlease ensure:\n- SEATS_API_KEY is properly set\n- Input parameters are correctly formatted\n- The requested airline source is supported`,
-          },
-        },
-      ],
-    };
-  },
 });
 
 server.tool(
