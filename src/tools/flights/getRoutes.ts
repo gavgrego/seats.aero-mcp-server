@@ -9,6 +9,7 @@ export async function getRoutesTool(args: GetRoutesParams) {
 
     if (!process.env.SEATS_API_KEY) {
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -34,6 +35,7 @@ export async function getRoutesTool(args: GetRoutesParams) {
     if (!routes.ok) {
       const errorText = await routes.text().catch(() => 'Unknown error');
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -66,6 +68,7 @@ export async function getRoutesTool(args: GetRoutesParams) {
     };
   } catch (error) {
     return {
+      isError: true,
       content: [
         {
           type: 'text' as const,

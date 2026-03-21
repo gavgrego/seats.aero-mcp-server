@@ -22,6 +22,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
 
     if (!process.env.SEATS_API_KEY) {
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -58,6 +59,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
     if (!flights.ok) {
       const errorText = await flights.text().catch(() => 'Unknown error');
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -90,6 +92,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
     };
   } catch (error) {
     return {
+      isError: true,
       content: [
         {
           type: 'text' as const,

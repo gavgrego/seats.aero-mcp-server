@@ -19,6 +19,7 @@ const getBulkAvailTool = async (params: GetBulkAvailParams) => {
 
     if (!process.env.SEATS_API_KEY) {
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -53,6 +54,7 @@ const getBulkAvailTool = async (params: GetBulkAvailParams) => {
     if (!bulkAvail.ok) {
       const errorText = await bulkAvail.text().catch(() => 'Unknown error');
       return {
+        isError: true,
         content: [
           {
             type: 'text' as const,
@@ -89,6 +91,7 @@ const getBulkAvailTool = async (params: GetBulkAvailParams) => {
     };
   } catch (error) {
     return {
+      isError: true,
       content: [
         {
           type: 'text' as const,
