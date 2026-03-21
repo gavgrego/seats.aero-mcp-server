@@ -71,6 +71,11 @@ export const GetRoutesSchema = z.object({
   source: z.enum(SOURCES),
 });
 
+export const GetTripsSchema = z.object({
+  id: z.string(),
+  include_filtered: z.boolean().optional(),
+});
+
 export type CabinClass = (typeof CABIN_CLASSES)[number];
 export type OrderByOption = (typeof ORDER_BY_OPTIONS)[number];
 export type Source = (typeof SOURCES)[number];
