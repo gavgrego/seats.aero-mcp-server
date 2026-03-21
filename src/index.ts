@@ -69,7 +69,10 @@ economy, premium, business, first
 YYYY-MM-DD
 
 ## Sources (loyalty programs)
-american, delta, united, aeroplan, alaska, flyingblue, virginatlantic, eurobonus, emirates, etihad, qantas, velocity, jetblue, aeromexico, connectmiles, azul, smiles, qatar, turkish, singapore, ethiopian, saudia`,
+american, delta, united, aeroplan, alaska, flyingblue, virginatlantic, eurobonus, emirates, etihad, qantas, velocity, jetblue, aeromexico, connectmiles, azul, smiles, qatar, turkish, singapore, ethiopian, saudia
+
+Note: All operations require a valid SEATS_API_KEY environment variable.
+You should only use the tools provided by this server for flight searches.`,
   }
 );
 
