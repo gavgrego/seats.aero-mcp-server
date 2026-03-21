@@ -43,3 +43,6 @@ Retrieve a large amount of availability objects from one specific mileage progra
 
 `get_routes`
 Retrieve a list of route objects from one specific mileage program (source). Your MCP client will be able to search via the same parameters as the [routes endpoint](https://developers.seats.aero/reference/get-routes-1).
+
+`get_trips`
+Retrieve full itinerary details for a specific availability ID, including departure/arrival times, flight numbers, aircraft type, fare class, and booking links. Use this after `get_flights` or `get_bulk_avail` to get actual flight times. Your MCP client will be able to search via the same parameters as the [get trips endpoint](https://developers.seats.aero/reference/get-trips).
