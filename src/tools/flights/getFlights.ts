@@ -18,6 +18,9 @@ export async function getFlightsTool(args: GetFlightsParams) {
       endDate,
       departureDate,
       cabinClass,
+      sources,
+      include_filtered,
+      minify_trips,
     } = args;
 
     if (!process.env.SEATS_API_KEY) {
@@ -44,7 +47,12 @@ export async function getFlightsTool(args: GetFlightsParams) {
     if (startDate) queryParams.append('start_date', startDate);
     if (endDate) queryParams.append('end_date', endDate);
     if (departureDate) queryParams.append('departure_date', departureDate);
-    if (cabinClass) queryParams.append('cabin_class', cabinClass);
+    if (cabinClass) queryParams.append('cabins', cabinClass);
+    if (sources) queryParams.append('sources', sources);
+    if (include_filtered !== undefined)
+      queryParams.append('include_filtered', include_filtered.toString());
+    if (minify_trips !== undefined)
+      queryParams.append('minify_trips', minify_trips.toString());
 
     const flights = await fetch(
       `https://seats.aero/partnerapi/search?${queryParams.toString()}`,
