@@ -46,7 +46,13 @@ export const GetFlightsSchema = z.object({
   skip: z.number().optional(),
   include_trips: z.boolean().optional(),
   only_direct_flights: z.boolean().optional(),
-  carriers: z.string().min(2).max(2).optional(),
+  carriers: z
+    .string()
+    .regex(/^[A-Za-z0-9]{2}(,[A-Za-z0-9]{2})*$/)
+    .optional(),
+  sources: z.string().optional(),
+  include_filtered: z.boolean().optional(),
+  minify_trips: z.boolean().optional(),
 });
 
 export const GetBulkAvailSchema = z.object({
