@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { Client } from '@modelcontextprotocol/client';
+import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 
 test('server advertises all current Seats.aero tools with JSON schemas', async () => {
   const client = new Client({ name: 'seats-mcp-test', version: '1.0.0' });
@@ -30,6 +30,11 @@ test('server advertises all current Seats.aero tools with JSON schemas', async (
       tools.get('get_flights').inputSchema.properties.cabins.type,
       'string'
     );
+    assert.match(
+      tools.get('get_flights').inputSchema.properties.cabins.description,
+      /comma-delimited/
+    );
+    assert.equal(tools.get('live_search').annotations.readOnlyHint, true);
     assert.deepEqual(
       tools.get('live_search').inputSchema.required.sort(),
       ['departureDate', 'destinationAirport', 'originAirport', 'source']

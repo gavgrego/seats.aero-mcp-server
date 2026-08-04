@@ -3,10 +3,10 @@
 FROM node:lts-alpine AS builder
 WORKDIR /app
 # Install dependencies and build
-COPY package.json tsconfig.json ./
+COPY package.json pnpm-lock.yaml tsconfig.json ./
 # Install the packageManager version declared in package.json via Corepack
 RUN corepack enable
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY src ./src
 RUN pnpm build
 
@@ -15,10 +15,10 @@ FROM node:lts-alpine
 WORKDIR /app
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-# Copy built files and package.json to install production deps
-COPY package.json ./
-# Install production dependencies
-RUN npm install --production
+# Install locked production dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/build ./build
 USER appuser
 # Now start the server via stdio transport

@@ -10,6 +10,8 @@ You need a Seats.aero partner API key. Eligible Seats.aero Pro users can generat
 
 ## Setup
 
+Requires Node.js 20 or newer.
+
 ```sh
 pnpm install
 pnpm build

@@ -1,5 +1,5 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { McpServer } from '@modelcontextprotocol/server';
+import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import {
   GetBulkAvailSchema,
   GetFlightsSchema,
@@ -13,13 +13,20 @@ import { getRoutesTool } from './tools/flights/getRoutes.js';
 import { getTripsTool } from './tools/flights/getTrips.js';
 import { liveSearchTool } from './tools/flights/liveSearch.js';
 
-const server = new McpServer(
-  {
-    name: 'seats-mcp',
-    version: '1.1.0',
-  },
-  {
-    instructions: `This server provides tools to search for award flight availability through seats.aero.
+const readOnlyToolAnnotations = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  openWorldHint: true,
+} as const;
+
+function createServer() {
+  const server = new McpServer(
+    {
+      name: 'seats-mcp',
+      version: '1.1.0',
+    },
+    {
+      instructions: `This server provides tools to search for award flight availability through seats.aero.
 
 Available tools:
 1. get_flights: Search for specific flight routes between airports
@@ -48,53 +55,62 @@ You should only use the tools provided by this server for flight searches.
 Cabin classes available: economy, premium, business, first
 Date format required: YYYY-MM-DD
 Sources supported: eurobonus, virginatlantic, aeromexico, american, delta, etihad, united, emirates, aeroplan, alaska, velocity, qantas, connectmiles, azul, smiles, flyingblue, jetblue, qatar, turkish, singapore, ethiopian, saudia, finnair, lufthansa, frontier, and spirit.`,
-  }
-);
+    }
+  );
 
-server.tool(
-  'get_flights',
-  'Get cached award flights on seats.aero.',
-  GetFlightsSchema.shape,
-  async (params) => {
-    return await getFlightsTool(params);
-  }
-);
+  server.registerTool(
+    'get_flights',
+    {
+      description: 'Get cached award flights on seats.aero.',
+      inputSchema: GetFlightsSchema,
+      annotations: readOnlyToolAnnotations,
+    },
+    getFlightsTool
+  );
 
-server.tool(
-  'get_bulk_avail',
-  'Find bulk availability for a particular source.',
-  GetBulkAvailSchema.shape,
-  async (params) => {
-    return await getBulkAvailTool(params);
-  }
-);
+  server.registerTool(
+    'get_bulk_avail',
+    {
+      description: 'Find bulk availability for a particular source.',
+      inputSchema: GetBulkAvailSchema,
+      annotations: readOnlyToolAnnotations,
+    },
+    getBulkAvailTool
+  );
 
-server.tool(
-  'get_routes',
-  'Get routes for a particular source.',
-  GetRoutesSchema.shape,
-  async (params) => {
-    return await getRoutesTool(params);
-  }
-);
+  server.registerTool(
+    'get_routes',
+    {
+      description: 'Get routes for a particular source.',
+      inputSchema: GetRoutesSchema,
+      annotations: readOnlyToolAnnotations,
+    },
+    getRoutesTool
+  );
 
-server.tool(
-  'get_trips',
-  'Get flight-level trip details for a cached Availability object.',
-  GetTripsSchema.shape,
-  async (params) => {
-    return await getTripsTool(params);
-  }
-);
+  server.registerTool(
+    'get_trips',
+    {
+      description:
+        'Get flight-level trip details for a cached Availability object.',
+      inputSchema: GetTripsSchema,
+      annotations: readOnlyToolAnnotations,
+    },
+    getTripsTool
+  );
 
-server.tool(
-  'live_search',
-  'Run a live award search for one route, date, and mileage program.',
-  LiveSearchSchema.shape,
-  async (params) => {
-    return await liveSearchTool(params);
-  }
-);
+  server.registerTool(
+    'live_search',
+    {
+      description:
+        'Run a live award search for one route, date, and mileage program.',
+      inputSchema: LiveSearchSchema,
+      annotations: readOnlyToolAnnotations,
+    },
+    liveSearchTool
+  );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+  return server;
+}
+
+serveStdio(createServer);
