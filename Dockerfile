@@ -3,10 +3,10 @@
 FROM node:lts-alpine AS builder
 WORKDIR /app
 # Install dependencies and build
-COPY package.json tsconfig.json pnpm-lock.yaml ./
-# Install pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm install --frozen-lockfile
+COPY package.json tsconfig.json ./
+# Install the packageManager version declared in package.json via Corepack
+RUN corepack enable
+RUN pnpm install --no-frozen-lockfile
 COPY src ./src
 RUN pnpm build
 

@@ -1,114 +1,57 @@
 import type { z } from 'zod';
 import { GetFlightsSchema } from '../../schema.js';
+import {
+  errorResult,
+  requestSeatsApi,
+  successResult,
+} from '../seatsApi.js';
 
 type GetFlightsParams = z.infer<typeof GetFlightsSchema>;
 
 export async function getFlightsTool(args: GetFlightsParams) {
+  const {
+    originAirport,
+    destinationAirport,
+    take = 500,
+    include_trips = false,
+    only_direct_flights = false,
+    carriers,
+    skip = 0,
+    order_by,
+    startDate,
+    endDate,
+    departureDate,
+    cabins,
+    cabinClass,
+    cursor,
+    sources,
+    include_filtered,
+    minify_trips,
+  } = args;
+
   try {
-    const {
-      originAirport,
-      destinationAirport,
-      take = 50,
-      include_trips = false,
-      only_direct_flights = false,
-      carriers,
-      skip = 0,
-      order_by = 'price',
-      startDate,
-      endDate,
-      departureDate,
-      cabinClass,
-      sources,
-      include_filtered,
-      minify_trips,
-    } = args;
+    const flights = await requestSeatsApi('search', {
+      query: {
+        origin_airport: originAirport,
+        destination_airport: destinationAirport,
+        start_date: startDate ?? departureDate,
+        end_date: endDate ?? departureDate,
+        cursor,
+        take,
+        order_by,
+        skip,
+        include_trips,
+        only_direct_flights,
+        carriers,
+        include_filtered,
+        sources,
+        minify_trips,
+        cabins: cabins ?? cabinClass,
+      },
+    });
 
-    if (!process.env.SEATS_API_KEY) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'Error: SEATS_API_KEY environment variable is not set',
-          },
-        ],
-        isError: true,
-      };
-    }
-
-    const queryParams = new URLSearchParams();
-    queryParams.append('origin_airport', originAirport.toString());
-    queryParams.append('destination_airport', destinationAirport.toString());
-    queryParams.append('skip', skip.toString());
-    queryParams.append('order_by', order_by);
-    queryParams.append('take', take.toString());
-    queryParams.append('include_trips', include_trips.toString());
-    queryParams.append('only_direct_flights', only_direct_flights.toString());
-    if (carriers) queryParams.append('carriers', carriers);
-    if (startDate) queryParams.append('start_date', startDate);
-    if (endDate) queryParams.append('end_date', endDate);
-    if (departureDate) queryParams.append('departure_date', departureDate);
-    if (cabinClass) queryParams.append('cabins', cabinClass);
-    if (sources) queryParams.append('sources', sources);
-    if (include_filtered !== undefined)
-      queryParams.append('include_filtered', include_filtered.toString());
-    if (minify_trips !== undefined)
-      queryParams.append('minify_trips', minify_trips.toString());
-
-    const flights = await fetch(
-      `https://seats.aero/partnerapi/search?${queryParams.toString()}`,
-      {
-        headers: {
-          accept: 'application/json',
-          'Partner-Authorization': process.env.SEATS_API_KEY || '',
-        },
-      }
-    );
-
-    if (!flights.ok) {
-      const errorText = await flights.text().catch(() => 'Unknown error');
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: `Error with seats.aero API (${flights.status}): ${errorText}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-
-    const flightsData = await flights.json();
-
-    if (!flightsData) {
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'No flights found matching your criteria.',
-          },
-        ],
-      };
-    }
-
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: `Flights:\n\n${JSON.stringify(flightsData, null, 2)}`,
-        },
-      ],
-    };
+    return successResult('Flights', flights);
   } catch (error) {
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: `Error searching flights: ${
-            error instanceof Error ? error.message : 'Unknown error'
-          }`,
-        },
-      ],
-      isError: true,
-    };
+    return errorResult('searching flights', error);
   }
 }

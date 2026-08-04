@@ -1,11 +1,11 @@
 {
   "name": "seats-mcp",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.1.0",
+  "description": "MCP server for the Seats.aero partner API",
+  "main": "build/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "pnpm run build && node --test test/*.test.mjs",
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node build/index.js"

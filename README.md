@@ -4,42 +4,52 @@
 
 ## Not affiliated with seats.aero
 
-A TypeScript-based, minimal MCP server for interacting with the seats.aero API via Claude desktop or any other MCP clients in natural language.
+A minimal TypeScript MCP server for searching award availability through the [Seats.aero partner API](https://developers.seats.aero/reference/getting-started-p).
 
-❗ You will need a seats.aero API key via a seats.aero Pro membership in order to use this tool
+You need a Seats.aero partner API key. Eligible Seats.aero Pro users can generate one from their Seats.aero settings; usage remains subject to the Seats.aero terms and API limits.
 
-### Setup
+## Setup
 
-Install dependencies
-`pnpm i`
+```sh
+pnpm install
+pnpm build
+pnpm start
+```
 
-Build and compile TypeScript
-`pnpm build`
-
-Start MCP server
-`pnpm start`
-
-### Config
-
-You will need to add your MCP server config to your `claude_desktop_config.json` file or whatever your MCP client of choice is.
+Set `SEATS_API_KEY` in your MCP client configuration:
 
 ```json
-"seats": {
-  "command": "node",
-  "args": ["/Users/USER/Sites/seats-mcp/build/index.js"],
-  "env": {
-    "SEATS_API_KEY": "SEATS_API_KEY"
+{
+  "mcpServers": {
+    "seats": {
+      "command": "node",
+      "args": ["/absolute/path/to/seats-mcp/build/index.js"],
+      "env": {
+        "SEATS_API_KEY": "YOUR_SEATS_AERO_API_KEY"
+      }
+    }
   }
 }
 ```
 
-### Tools available
+## Tools
 
-`get_flights`
-Get a list of flights. Your MCP client will be able to search via the same parameters as the [cached search endpoint](https://developers.seats.aero/reference/cached-search)
+| Tool | Seats.aero endpoint | Purpose |
+| --- | --- | --- |
+| `get_flights` | [Cached Search](https://developers.seats.aero/reference/cached-search) | Search cached availability across airports, dates, cabins, carriers, and mileage programs. |
+| `get_bulk_avail` | [Bulk Availability](https://developers.seats.aero/reference/get-availability) | Retrieve many cached availability objects from one mileage program. |
+| `get_routes` | [Get Routes](https://developers.seats.aero/reference/get-routes-1) | List routes tracked for one mileage program. |
+| `get_trips` | [Get Trips](https://developers.seats.aero/reference/get-trips) | Retrieve flight-level details for an Availability object. |
+| `live_search` | [Live Search](https://developers.seats.aero/reference/live-search) | Search a specific route and date live for one mileage program. |
 
-`get_bulk_avail`
-Retrieve a large amount of availability objects from one specific mileage program (source). Your MCP client will be able to search via the same parameters as the [bulk availability endpoint](https://developers.seats.aero/reference/get-availability)
+Cached search accepts comma-delimited airport lists (`SFO,LAX`), cabin lists (`economy,business`), carrier lists (`DL,AA`), and source lists (`aeroplan,united`). Dates use `YYYY-MM-DD`.
 
-`get_routes`
-Retrieve a list of route objects from one specific mileage program (source). Your MCP client will be able to search via the same parameters as the [routes endpoint](https://developers.seats.aero/reference/get-routes-1).
+Live searches can be slower and consume a partner API call. Prefer `get_flights` when cached availability is sufficient.
+
+## Development
+
+```sh
+pnpm test
+```
+
+The tests build the server and exercise request construction with a mocked Seats.aero API.
