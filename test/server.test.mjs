@@ -21,10 +21,12 @@ test('server advertises all current Seats.aero tools with JSON schemas', async (
 
     assert.deepEqual([...tools.keys()].sort(), [
       'get_bulk_avail',
+      'get_destinations',
       'get_flights',
       'get_routes',
       'get_trips',
       'live_search',
+      'refresh_cached_data',
     ]);
     assert.equal(
       tools.get('get_flights').inputSchema.properties.cabins.type,
@@ -35,6 +37,19 @@ test('server advertises all current Seats.aero tools with JSON schemas', async (
       /comma-delimited/
     );
     assert.equal(tools.get('live_search').annotations.readOnlyHint, true);
+    assert.match(tools.get('live_search').description, /cannot be used.*Pro/i);
+    assert.equal(
+      tools.get('live_search')._meta['seats.aero/access'],
+      'commercial-agreement-required'
+    );
+    assert.equal(
+      tools.get('refresh_cached_data')._meta['seats.aero/access'],
+      'pro-only'
+    );
+    assert.equal(
+      tools.get('refresh_cached_data').annotations.readOnlyHint,
+      false
+    );
     assert.deepEqual(
       tools.get('live_search').inputSchema.required.sort(),
       ['departureDate', 'destinationAirport', 'originAirport', 'source']

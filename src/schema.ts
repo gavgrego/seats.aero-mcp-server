@@ -193,6 +193,30 @@ export const GetRoutesSchema = z.object({
   source: z.enum(SOURCES).describe('Mileage program source to list routes for.'),
 });
 
+export const GetDestinationsSchema = z
+  .object({
+    originAirport: airportCode
+      .optional()
+      .describe(
+        'Origin airport or metro code. Returns reachable nonstop destinations.'
+      ),
+    destinationAirport: airportCode
+      .optional()
+      .describe(
+        'Destination airport or metro code. Returns nonstop origin airports.'
+      ),
+  })
+  .refine(
+    ({ originAirport, destinationAirport }) =>
+      Number(originAirport !== undefined) +
+        Number(destinationAirport !== undefined) ===
+      1,
+    {
+      message:
+        'Provide exactly one of originAirport or destinationAirport, not both.',
+    }
+  );
+
 export const GetTripsSchema = z.object({
   id: z.string().min(1).describe('ID of an Availability object.'),
   include_filtered: z
@@ -221,6 +245,16 @@ export const LiveSearchSchema = z.object({
     .max(9)
     .optional()
     .describe('Number of adult passengers to search for (1-9; default 1).'),
+});
+
+export const RefreshCachedDataSchema = z.object({
+  availabilityIds: z
+    .array(z.string().min(1))
+    .min(1)
+    .max(250)
+    .describe(
+      'One to 250 Availability object IDs returned by cached search or bulk availability.'
+    ),
 });
 
 export type CabinClass = (typeof CABIN_CLASSES)[number];

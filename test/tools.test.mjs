@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
 
-import { GetBulkAvailSchema, LiveSearchSchema } from '../build/schema.js';
+import {
+  GetBulkAvailSchema,
+  GetDestinationsSchema,
+  LiveSearchSchema,
+  RefreshCachedDataSchema,
+} from '../build/schema.js';
 import { getBulkAvailTool } from '../build/tools/flights/getBulkAvail.js';
+import { getDestinationsTool } from '../build/tools/flights/getDestinations.js';
 import { getFlightsTool } from '../build/tools/flights/getFlights.js';
 import { getTripsTool } from '../build/tools/flights/getTrips.js';
 import { liveSearchTool } from '../build/tools/flights/liveSearch.js';
+import { refreshCachedDataTool } from '../build/tools/flights/refreshCachedData.js';
 
 const originalFetch = globalThis.fetch;
 const originalApiKey = process.env.SEATS_API_KEY;
@@ -100,6 +107,73 @@ test('get trips encodes the availability ID and forwards include_filtered', asyn
   const url = new URL(request[0]);
   assert.equal(url.pathname, '/partnerapi/trips/availability%2Fid');
   assert.equal(url.searchParams.get('include_filtered'), 'true');
+});
+
+test('get destinations sends exactly one airport direction', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  let request;
+  globalThis.fetch = async (...args) => {
+    request = args;
+    return mockJsonResponse({ destinations: [] });
+  };
+
+  await getDestinationsTool({ originAirport: 'SFO' });
+
+  const url = new URL(request[0]);
+  assert.equal(url.pathname, '/partnerapi/destinations');
+  assert.equal(url.searchParams.get('origin_airport'), 'SFO');
+  assert.equal(url.searchParams.has('destination_airport'), false);
+});
+
+test('destination schema requires exactly one origin or destination', () => {
+  assert.equal(
+    GetDestinationsSchema.safeParse({ originAirport: 'SFO' }).success,
+    true
+  );
+  assert.equal(
+    GetDestinationsSchema.safeParse({ destinationAirport: 'JFK' }).success,
+    true
+  );
+  assert.equal(GetDestinationsSchema.safeParse({}).success, false);
+  assert.equal(
+    GetDestinationsSchema.safeParse({
+      originAirport: 'SFO',
+      destinationAirport: 'JFK',
+    }).success,
+    false
+  );
+});
+
+test('refresh cached data sends 1-250 availability IDs as JSON', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  let request;
+  globalThis.fetch = async (...args) => {
+    request = args;
+    return mockJsonResponse({ complete: false });
+  };
+
+  await refreshCachedDataTool({
+    availabilityIds: ['availability-1', 'availability-2'],
+  });
+
+  const [input, init] = request;
+  const url = new URL(input);
+  assert.equal(url.pathname, '/partnerapi/refresh');
+  assert.equal(init.method, 'POST');
+  assert.equal(init.headers['content-type'], 'application/json');
+  assert.deepEqual(JSON.parse(init.body), {
+    availability_ids: ['availability-1', 'availability-2'],
+  });
+  assert.equal(
+    RefreshCachedDataSchema.safeParse({ availabilityIds: [] }).success,
+    false
+  );
+  assert.equal(
+    RefreshCachedDataSchema.safeParse({
+      availabilityIds: Array.from({ length: 251 }, (_, index) => String(index)),
+    }).success,
+    false
+  );
 });
 
 test('live search sends the documented JSON request body', async () => {
