@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0](https://github.com/gavgrego/seats.aero-mcp-server/compare/v1.1.0...v1.2.0) (2026-08-10)
+
+
+### Features
+
+* complete partner endpoints and automate releases ([8875e2c](https://github.com/gavgrego/seats.aero-mcp-server/commit/8875e2cc975c44700eedb899f38f28a3c8bb110b))
+
 ## [1.1.0] - 2026-08-03
 
 ### Added
