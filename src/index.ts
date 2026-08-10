@@ -34,7 +34,7 @@ function createServer() {
   const server = new McpServer(
     {
       name: 'seats-mcp',
-      version: '1.1.0', // x-release-please-version
+      version: '1.2.0', // x-release-please-version
     },
     {
       instructions: `This server provides tools to search for award flight availability through seats.aero.
