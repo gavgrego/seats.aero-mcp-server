@@ -4,16 +4,16 @@
 
 ## Not affiliated with seats.aero
 
-A minimal TypeScript MCP server for searching award availability through the [Seats.aero partner API](https://developers.seats.aero/reference/getting-started-p).
+A minimal TypeScript MCP server for searching award availability through the [seats.aero partner API](https://developers.seats.aero/reference/getting-started-p).
 
-You need a Seats.aero Partner API key. Eligible Seats.aero Pro users can generate one from their Seats.aero settings; usage remains subject to the Seats.aero terms and API limits.
+You need a seats.aero Partner API key. Eligible seats.aero Pro users can generate one from their seats.aero settings; usage remains subject to the seats.aero terms and API limits.
 
 ### Endpoint access
 
 Not every endpoint is available to every Partner API user:
 
-- `live_search` **cannot be used with a Seats.aero Pro API key**. It requires a
-  commercial agreement with Seats.aero.
+- `live_search` **cannot be used with a seats.aero Pro API key**. It requires a
+  commercial agreement with seats.aero.
 - `refresh_cached_data` cannot currently be used by commercial users; the API
   documentation directs commercial users to `live_search` instead.
 
@@ -48,7 +48,7 @@ Set `SEATS_API_KEY` in your MCP client configuration:
 
 ## Tools
 
-| Tool | Seats.aero endpoint | Access | Purpose |
+| Tool | seats.aero endpoint | Access | Purpose |
 | --- | --- | --- | --- |
 | `get_flights` | [Cached Search](https://developers.seats.aero/reference/cached-search) | Partner API | Search cached availability across airports, dates, cabins, carriers, and mileage programs. |
 | `get_bulk_avail` | [Bulk Availability](https://developers.seats.aero/reference/get-availability) | Partner API | Retrieve many cached availability objects from one mileage program. |
@@ -65,7 +65,7 @@ unavailable, so callers should limit retries and use exponential backoff. Prefer
 `get_flights` when cached availability is sufficient.
 
 This covers all seven active `Partner-Authorization` endpoints in the current
-Seats.aero API reference. OAuth consent, token, and user-info endpoints are not
+seats.aero API reference. OAuth consent, token, and user-info endpoints are not
 exposed as tools because they are application authorization flows rather than
 award-availability operations; this server authenticates with
 `SEATS_API_KEY`.
@@ -76,7 +76,7 @@ award-availability operations; this server authenticates with
 pnpm test
 ```
 
-The tests build the server and exercise request construction with a mocked Seats.aero API.
+The tests build the server and exercise request construction with a mocked seats.aero API.
 
 ## Releases
 
