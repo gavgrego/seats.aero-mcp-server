@@ -20,6 +20,7 @@ export async function liveSearchTool({
   try {
     const results = await requestSeatsApi('live', {
       method: 'POST',
+      timeoutMs: 60_000,
       body: {
         origin_airport: originAirport,
         destination_airport: destinationAirport,

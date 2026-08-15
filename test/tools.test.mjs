@@ -10,6 +10,7 @@ import {
 import { getBulkAvailTool } from '../build/tools/flights/getBulkAvail.js';
 import { getDestinationsTool } from '../build/tools/flights/getDestinations.js';
 import { getFlightsTool } from '../build/tools/flights/getFlights.js';
+import { getRoutesTool } from '../build/tools/flights/getRoutes.js';
 import { getTripsTool } from '../build/tools/flights/getTrips.js';
 import { liveSearchTool } from '../build/tools/flights/liveSearch.js';
 import { refreshCachedDataTool } from '../build/tools/flights/refreshCachedData.js';
@@ -45,7 +46,8 @@ test('cached search uses documented parameters and defaults', async () => {
   const result = await getFlightsTool({
     originAirport: 'SFO,LAX',
     destinationAirport: 'FRA,LHR',
-    departureDate: '2026-10-12',
+    startDate: '2026-10-12',
+    endDate: '2026-10-19',
     cabins: 'economy,business',
     cursor: 123456,
     order_by: 'lowest_mileage',
@@ -59,17 +61,17 @@ test('cached search uses documented parameters and defaults', async () => {
   assert.equal(url.searchParams.get('origin_airport'), 'SFO,LAX');
   assert.equal(url.searchParams.get('destination_airport'), 'FRA,LHR');
   assert.equal(url.searchParams.get('start_date'), '2026-10-12');
-  assert.equal(url.searchParams.get('end_date'), '2026-10-12');
+  assert.equal(url.searchParams.get('end_date'), '2026-10-19');
   assert.equal(url.searchParams.has('departure_date'), false);
   assert.equal(url.searchParams.get('cabins'), 'economy,business');
   assert.equal(url.searchParams.get('cursor'), '123456');
-  assert.equal(url.searchParams.get('take'), '500');
+  assert.equal(url.searchParams.get('take'), '50');
   assert.equal(url.searchParams.get('order_by'), 'lowest_mileage');
   assert.equal(url.searchParams.get('include_filtered'), 'true');
   assert.equal(init.headers['Partner-Authorization'], 'test-key');
 });
 
-test('bulk availability supports regions, filtered results, and the 500-result default', async () => {
+test('bulk availability supports regions, filtered results, and the 50-result default', async () => {
   process.env.SEATS_API_KEY = 'test-key';
   let request;
   globalThis.fetch = async (...args) => {
@@ -90,7 +92,7 @@ test('bulk availability supports regions, filtered results, and the 500-result d
   assert.equal(url.searchParams.get('origin_region'), 'North America');
   assert.equal(url.searchParams.get('destination_region'), 'Europe');
   assert.equal(url.searchParams.get('include_filtered'), 'true');
-  assert.equal(url.searchParams.get('take'), '500');
+  assert.equal(url.searchParams.get('take'), '50');
   assert.equal(url.searchParams.get('skip'), '0');
 });
 
@@ -252,4 +254,93 @@ test('Seats.aero HTTP failures are returned as MCP tool errors', async () => {
 
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /Seats\.aero API \(400\)/);
+});
+
+test('large data arrays are truncated to protect the agent context window', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  const bigItem = { route: 'GRU-NRT', pad: 'x'.repeat(200) };
+  globalThis.fetch = async () =>
+    mockJsonResponse({
+      TotalRoutes: 500,
+      data: Array.from({ length: 500 }, () => bigItem),
+    });
+
+  const result = await getFlightsTool({
+    originAirport: 'GRU',
+    destinationAirport: 'NRT',
+  });
+
+  assert.equal(result.isError, undefined);
+  assert.ok(result.content[0].text.length < 40_000);
+  const payload = JSON.parse(result.content[0].text.split('\n\n')[1]);
+  assert.ok(payload.data.length < 500);
+  assert.match(payload._mcp_truncated, /Use (skip|cursor|narrower)/);
+});
+
+test('large live-search result arrays are also truncated', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  const bigItem = { pad: 'x'.repeat(300) };
+  globalThis.fetch = async () =>
+    mockJsonResponse({
+      success: true,
+      results: Array.from({ length: 300 }, () => bigItem),
+    });
+
+  const result = await liveSearchTool({
+    originAirport: 'GRU',
+    destinationAirport: 'NRT',
+    departureDate: '2026-10-13',
+    source: 'smiles',
+  });
+
+  assert.equal(result.isError, undefined);
+  const payload = JSON.parse(result.content[0].text.split('\n\n')[1]);
+  assert.ok(payload.results.length < 300);
+  assert.equal(typeof payload._mcp_truncated, 'string');
+});
+
+test('429 responses include retry guidance and the Retry-After delay', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ error: 'rate limit' }), {
+      status: 429,
+      headers: { 'content-type': 'application/json', 'retry-after': '30' },
+    });
+
+  const result = await getFlightsTool({
+    originAirport: 'SFO',
+    destinationAirport: 'LHR',
+  });
+
+  assert.equal(result.isError, true);
+  assert.match(result.content[0].text, /429/);
+  assert.match(result.content[0].text, /30/);
+  assert.match(result.content[0].text, /wait/i);
+});
+
+test('requests carry an abort signal so a hung API cannot block a tool forever', async () => {
+  process.env.SEATS_API_KEY = 'test-key';
+  let request;
+  globalThis.fetch = async (...args) => {
+    request = args;
+    return mockJsonResponse({ data: [] });
+  };
+
+  await getFlightsTool({ originAirport: 'SFO', destinationAirport: 'LHR' });
+
+  const init = request[1];
+  assert.ok(init.signal instanceof AbortSignal);
+});
+
+test('API key is trimmed before use', async () => {
+  process.env.SEATS_API_KEY = '  test-key  ';
+  let request;
+  globalThis.fetch = async (...args) => {
+    request = args;
+    return mockJsonResponse({ data: [] });
+  };
+
+  await getRoutesTool({ source: 'smiles' });
+
+  assert.equal(request[1].headers['Partner-Authorization'], 'test-key');
 });

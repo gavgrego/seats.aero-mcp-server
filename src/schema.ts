@@ -117,7 +117,7 @@ export const GetFlightsSchema = z.object({
     .min(10)
     .max(1000)
     .optional()
-    .describe('Maximum results to return (10-1000; default 500).'),
+    .describe('Maximum results to return (10-1000; default 50).'),
   order_by: z
     .literal('lowest_mileage')
     .optional()
@@ -180,7 +180,7 @@ export const GetBulkAvailSchema = z.object({
     .min(10)
     .max(1000)
     .optional()
-    .describe('Maximum results to return (10-1000; default 500).'),
+    .describe('Maximum results to return (10-1000; default 50).'),
   skip: z.number().int().nonnegative().optional(),
   cursor: z.number().int().nonnegative().optional(),
   include_filtered: z

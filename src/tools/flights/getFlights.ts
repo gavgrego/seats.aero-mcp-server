@@ -12,7 +12,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
   const {
     originAirport,
     destinationAirport,
-    take = 500,
+    take = 50,
     include_trips = false,
     only_direct_flights = false,
     carriers,
