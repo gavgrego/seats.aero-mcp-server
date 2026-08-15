@@ -78,7 +78,7 @@ const sourceList = z.string().refine(
   'Expected one or more supported, comma-delimited mileage program sources'
 );
 
-export const GetFlightsSchema = z.object({
+export const GetFlightsSchema = z.strictObject({
   originAirport: airportList.describe(
     'Origin airport codes, comma-delimited when searching multiple airports (for example, SFO,LAX).'
   ),
@@ -91,20 +91,11 @@ export const GetFlightsSchema = z.object({
   endDate: date
     .optional()
     .describe('Latest departure date, in YYYY-MM-DD format.'),
-  departureDate: date
-    .optional()
-    .describe(
-      'Deprecated single-date alias. When startDate or endDate is omitted, this value is used for that bound.'
-    ),
   cabins: cabinList
     .optional()
     .describe(
       'Cabins that must be available, comma-delimited when specifying multiple cabins.'
     ),
-  cabinClass: z
-    .enum(CABIN_CLASSES)
-    .optional()
-    .describe('Deprecated single-cabin alias for cabins.'),
   cursor: z
     .number()
     .int()
@@ -180,7 +171,7 @@ export const GetBulkAvailSchema = z.object({
     .min(10)
     .max(1000)
     .optional()
-    .describe('Maximum results to return (10-1000; default 50).'),
+    .describe('Maximum results to return (10-1000; default 500).'),
   skip: z.number().int().nonnegative().optional(),
   cursor: z.number().int().nonnegative().optional(),
   include_filtered: z

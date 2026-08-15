@@ -20,9 +20,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
     order_by,
     startDate,
     endDate,
-    departureDate,
     cabins,
-    cabinClass,
     cursor,
     sources,
     include_filtered,
@@ -34,8 +32,8 @@ export async function getFlightsTool(args: GetFlightsParams) {
       query: {
         origin_airport: originAirport,
         destination_airport: destinationAirport,
-        start_date: startDate ?? departureDate,
-        end_date: endDate ?? departureDate,
+        start_date: startDate,
+        end_date: endDate,
         cursor,
         take,
         order_by,
@@ -46,7 +44,7 @@ export async function getFlightsTool(args: GetFlightsParams) {
         include_filtered,
         sources,
         minify_trips,
-        cabins: cabins ?? cabinClass,
+        cabins,
       },
     });
 

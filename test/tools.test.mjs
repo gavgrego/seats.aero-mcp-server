@@ -4,6 +4,7 @@ import { afterEach, test } from 'node:test';
 import {
   GetBulkAvailSchema,
   GetDestinationsSchema,
+  GetFlightsSchema,
   LiveSearchSchema,
   RefreshCachedDataSchema,
 } from '../build/schema.js';
@@ -254,6 +255,28 @@ test('Seats.aero HTTP failures are returned as MCP tool errors', async () => {
 
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /Seats\.aero API \(400\)/);
+});
+
+test('deprecated departureDate and cabinClass aliases are rejected by the schema', () => {
+  const base = { originAirport: 'SFO', destinationAirport: 'LHR' };
+  assert.equal(
+    GetFlightsSchema.safeParse({ ...base, departureDate: '2026-10-12' })
+      .success,
+    false
+  );
+  assert.equal(
+    GetFlightsSchema.safeParse({ ...base, cabinClass: 'economy' }).success,
+    false
+  );
+  assert.equal(
+    GetFlightsSchema.safeParse({
+      ...base,
+      startDate: '2026-10-12',
+      endDate: '2026-10-19',
+      cabins: 'economy',
+    }).success,
+    true
+  );
 });
 
 test('large data arrays are truncated to protect the agent context window', async () => {
