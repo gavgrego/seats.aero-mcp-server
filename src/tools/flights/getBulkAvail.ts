@@ -17,7 +17,7 @@ export async function getBulkAvailTool(params: GetBulkAvailParams) {
     originRegion,
     destinationRegion,
     cursor,
-    take = 500,
+    take = 50,
     skip = 0,
     include_filtered,
   } = params;

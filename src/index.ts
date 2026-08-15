@@ -72,6 +72,9 @@ Available tools:
 
 Note: All operations require a valid SEATS_API_KEY environment variable.
 You should only use the tools provided by this server for flight searches.
+Searches default to 50 results and large responses are truncated to protect
+your context window; paginate with skip or cursor and narrow filters instead
+of raising take aggressively.
 
 Cabin classes available: economy, premium, business, first
 Date format required: YYYY-MM-DD
@@ -82,7 +85,8 @@ Sources supported: eurobonus, virginatlantic, aeromexico, american, delta, etiha
   server.registerTool(
     'get_flights',
     {
-      description: 'Get cached award flights on seats.aero.',
+      description:
+        'Get cached award flights on seats.aero. Defaults to 50 results; paginate with skip or cursor.',
       inputSchema: GetFlightsSchema,
       annotations: readOnlyToolAnnotations,
     },
