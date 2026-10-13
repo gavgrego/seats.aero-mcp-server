@@ -2,6 +2,12 @@
 
 # seats.aero MCP server
 
+> [!IMPORTANT]
+> This community-built MCP server is no longer maintained and will not receive
+> further updates. Seats.aero now provides an
+> [official MCP server](https://seats.aero/mcp); please use the official server
+> for new and existing integrations.
+
 ## Not affiliated with seats.aero
 
 A minimal TypeScript MCP server for searching award availability through the [seats.aero partner API](https://developers.seats.aero/reference/getting-started-p).
