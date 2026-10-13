@@ -3,8 +3,8 @@
 # seats.aero MCP server
 
 > [!IMPORTANT]
-> This community-built MCP server is no longer maintained and will not receive
-> further updates. Seats.aero now provides an
+> This MCP server is no longer maintained and will not receive further updates.
+> seats.aero now provides an
 > [official MCP server](https://seats.aero/mcp); please use the official server
 > for new and existing integrations.
 
